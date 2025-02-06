@@ -1,70 +1,70 @@
-name: Deploy Vite.js App to AKS
+# name: Deploy Vite.js App to AKS
 
-on:
-  push:
-    branches:
-      - main  # Trigger on push to the 'main' branch
+# on:
+#   push:
+#     branches:
+#       - main  # Trigger on push to the 'main' branch
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest  # Use the latest Ubuntu runner
 
-    steps:
-      # Step 1: Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v3
+#     steps:
+#       # Step 1: Checkout the code
+#       - name: Checkout code
+#         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js (Vite.js needs Node.js)
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '23'  # You can change this to '17' or higher if needed
+#       # Step 2: Set up Node.js (Vite.js needs Node.js)
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '23'  # You can change this to '17' or higher if needed
 
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: npm install
+#       # Step 3: Install dependencies
+#       - name: Install dependencies
+#         run: npm install
 
-      # Step 4: Build the Vite.js app
-      - name: Build Vite.js app
-        run: npm run build
+#       # Step 4: Build the Vite.js app
+#       - name: Build Vite.js app
+#         run: npm run build
 
-      # Step 5: Log in to Azure using Service Principal credentials
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Make sure you've added the Azure credentials as secrets
+#       # Step 5: Log in to Azure using Service Principal credentials
+#       - name: Log in to Azure
+#         uses: azure/login@v1
+#         with:
+#           creds: ${{ secrets.AZURE_CREDENTIALS }}  # Make sure you've added the Azure credentials as secrets
 
-      # Step 6: Log in to ACR (Azure Container Registry)
-      - name: Log in to ACR
-        run: |
-          az acr login --name vamsiacr  # Replace vamsiacr with your ACR name
+#       # Step 6: Log in to ACR (Azure Container Registry)
+#       - name: Log in to ACR
+#         run: |
+#           az acr login --name vamsiacr  # Replace vamsiacr with your ACR name
 
-      # Step 7: Build Docker image and tag it
-      - name: Build Docker image
-        run: |
-          docker build -t vamsiacr.azurecr.io/vite-app:latest .  # Replace with your image name in ACR
+#       # Step 7: Build Docker image and tag it
+#       - name: Build Docker image
+#         run: |
+#           docker build -t vamsiacr.azurecr.io/vite-app:latest .  # Replace with your image name in ACR
 
-      # Step 8: Push Docker image to ACR
-      - name: Push Docker image to ACR
-        run: |
-          docker push vamsiacr.azurecr.io/vite-app:latest  # Make sure your ACR URL and image name are correct
+#       # Step 8: Push Docker image to ACR
+#       - name: Push Docker image to ACR
+#         run: |
+#           docker push vamsiacr.azurecr.io/vite-app:latest  # Make sure your ACR URL and image name are correct
 
-      # Step 9: Deploy to AKS
-      - name: Deploy to AKS
-        run: |
-          # Fetch AKS credentials
-          az aks get-credentials --resource-group vamsi --name vamsiaks  # Replace with your AKS resource group and name
+#       # Step 9: Deploy to AKS
+#       - name: Deploy to AKS
+#         run: |
+#           # Fetch AKS credentials
+#           az aks get-credentials --resource-group vamsi --name vamsiaks  # Replace with your AKS resource group and name
 
-          # Apply deployment and service YAML files
-          kubectl apply -f aks/deployment.yaml  # Correct path to your AKS deployment YAML file
-          kubectl apply -f aks/service.yaml     # Correct path to your AKS service YAML file
+#           # Apply deployment and service YAML files
+#           kubectl apply -f aks/deployment.yaml  # Correct path to your AKS deployment YAML file
+#           kubectl apply -f aks/service.yaml     # Correct path to your AKS service YAML file
 
-          # Rollout restart to apply changes and ensure the deployment picks up the latest image
-          kubectl rollout restart deployment/my-vite-app-deployment  # Ensure it restarts with the latest changes
+#           # Rollout restart to apply changes and ensure the deployment picks up the latest image
+#           kubectl rollout restart deployment/my-vite-app-deployment  # Ensure it restarts with the latest changes
 
-          # Verify deployment
-          kubectl get pods  # To check the status of your pods after deployment
-          kubectl get services  # To check the status of your services after deployment
+#           # Verify deployment
+#           kubectl get pods  # To check the status of your pods after deployment
+#           kubectl get services  # To check the status of your services after deployment
 
 # name: Deploy Vite.js App to AKS
 
@@ -131,4 +131,42 @@ jobs:
 #           # Verify the deployment status
 #           kubectl get pods  # To check the status of your pods after deployment
 #           kubectl get services  # To check the status of your services after deployment
+name: Deploy Vite.js App to AKS
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the 'main' branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Send email to admin for approval
+      - name: Send approval email to admin
+        run: |
+          curl -X POST "https://api.sendgrid.com/v3/mail/send" \
+          -H "Authorization: Bearer ${{ secrets.SENDGRID_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "personalizations": [{
+                  "to": [{"email": "admin@example.com"}],
+                  "subject": "Please approve the deployment"
+                }],
+                "from": {"email": "no-reply@example.com"},
+                "content": [{
+                  "type": "text/html",
+                  "value": "<html><body><h2>Deploy Vite.js App to AKS</h2><p>Click the button below to approve the deployment:</p><a href='https://github.com/your-org/your-repo/approve-deployment?token=${{ secrets.APPROVAL_TOKEN }}'>Approve Deployment</a></body></html>"
+                }]
+              }'
+
+      # Step 3: Await approval via a custom approval system (could use external API to handle approval)
+
+      # The rest of your workflow steps (building Docker image, pushing to ACR, deploying to AKS) remain the same
+
 
