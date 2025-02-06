@@ -37,23 +37,23 @@ jobs:
       # Step 6: Log in to ACR
       - name: Log in to ACR
         run: |
-          az acr login --name ${{ secrets.ACR_NAME }}
+          az acr login --name vamsiacr
 
       # Step 7: Build Docker image and tag it
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/vite-app:latest .
+          docker build -t vamsiacr.azurecr.io/vite-app:latest .
 
       # Step 8: Push Docker image to ACR
       - name: Push Docker image to ACR
         run: |
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/vite-app:latest
+          docker push vamsiacr.azurecr.io/vite-app:latest
 
       # Step 9: Deploy to AKS
       - name: Deploy to AKS
         run: |
-          az aks get-credentials --resource-group ${{ secrets.RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}
-          kubectl apply -f k8s/deployment.yml
-          kubectl apply -f k8s/service.yml
+          az aks get-credentials --resource-group vamsi --name vamsiaks
+          kubectl apply -f aks/deployment.yml
+          kubectl apply -f aks/service.yml
           kubectl get pods
           kubectl get services
