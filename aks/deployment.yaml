@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-vite-app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-vite-app
+  template:
+    metadata:
+      labels:
+        app: my-vite-app
+    spec:
+      containers:
+        - name: my-vite-app
+          image: vamsiacr.azurecr.io/my-vite-app:latest
+          ports:
+            - containerPort: 80
