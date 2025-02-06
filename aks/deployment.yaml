@@ -14,6 +14,5 @@ spec:
     spec:
       containers:
         - name: my-vite-app
-          image: vamsiacr.azurecr.io/my-vite-app:latest
-          ports:
-            - containerPort: 80
+          image: vamsiacr.azurecr.io/vite-app:latest  # Use the same tag as in the GitHub Actions workflow
+          imagePullPolicy: Always  # Ensure Kubernetes always pulls the latest image
