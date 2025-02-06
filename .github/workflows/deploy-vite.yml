@@ -52,8 +52,13 @@ jobs:
       # Step 9: Deploy to AKS
       - name: Deploy to AKS
         run: |
+          # Fetch AKS credentials
           az aks get-credentials --resource-group vamsi --name vamsiaks  # Replace with your AKS resource group and name
-          kubectl apply -f aks/deployment.yml  # Path to your AKS deployment YAML file
-          kubectl apply -f aks/service.yml  # Path to your AKS service YAML file
+          
+          # Apply deployment and service YAML files
+          kubectl apply -f aks/deployment.yaml  # Correct path to your AKS deployment YAML file
+          kubectl apply -f aks/service.yaml     # Correct path to your AKS service YAML file
+
+          # Verify deployment
           kubectl get pods  # To check the status of your pods after deployment
           kubectl get services  # To check the status of your services after deployment
