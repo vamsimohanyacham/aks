@@ -155,13 +155,13 @@ jobs:
           -H "Content-Type: application/json" \
           -d '{
                 "personalizations": [{
-                  "to": [{"email": "admin@example.com"}],
+                  "to": [{"email": "vamsi@middlewaretalents.com"}],
                   "subject": "Please approve the deployment"
                 }],
-                "from": {"email": "no-reply@example.com"},
+                "from": {"email": "vamsimohanyacham@gmail.com"},
                 "content": [{
                   "type": "text/html",
-                  "value": "<html><body><h2>Deploy Vite.js App to AKS</h2><p>Click the button below to approve the deployment:</p><a href='https://github.com/your-org/your-repo/approve-deployment?token=${{ secrets.APPROVAL_TOKEN }}'>Approve Deployment</a></body></html>"
+                  "value": "<html><body><h2>Deploy Vite.js App to AKS</h2><p>Click the button below to approve the deployment:</p><a href='https://github.com/vamsimohanyacham/aks/approve-deployment?token=${{ secrets.APPROVAL_TOKEN }}'>Approve Deployment</a></body></html>"
                 }]
               }'
 
