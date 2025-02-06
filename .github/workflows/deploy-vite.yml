@@ -39,17 +39,15 @@ jobs:
         run: |
           az acr login --name vamsiacr  # Replace vamsiacr with your ACR name
 
-      # Step 7: Build Docker image and tag it with the commit SHA (or 'latest' if preferred)
+      # Step 7: Build Docker image and tag it
       - name: Build Docker image
         run: |
-          IMAGE_TAG=latest  # You can use `${{ github.sha }}` for commit-specific tags
-          docker build -t vamsiacr.azurecr.io/vite-app:$IMAGE_TAG .
-        
+          docker build -t vamsiacr.azurecr.io/vite-app:latest .  # Replace with your image name in ACR
+
       # Step 8: Push Docker image to ACR
       - name: Push Docker image to ACR
         run: |
-          IMAGE_TAG=latest  # Ensure the same tag is used as in the build step
-          docker push vamsiacr.azurecr.io/vite-app:$IMAGE_TAG
+          docker push vamsiacr.azurecr.io/vite-app:latest  # Make sure your ACR URL and image name are correct
 
       # Step 9: Deploy to AKS
       - name: Deploy to AKS
@@ -58,8 +56,11 @@ jobs:
           az aks get-credentials --resource-group vamsi --name vamsiaks  # Replace with your AKS resource group and name
 
           # Apply deployment and service YAML files
-          kubectl apply -f aks/deployment.yaml  # Ensure this file is properly defined
-          kubectl apply -f aks/service.yaml     # Ensure this file is properly defined
+          kubectl apply -f aks/deployment.yaml  # Correct path to your AKS deployment YAML file
+          kubectl apply -f aks/service.yaml     # Correct path to your AKS service YAML file
+
+          # Rollout restart to apply changes and ensure the deployment picks up the latest image
+          kubectl rollout restart deployment/my-vite-app-deployment  # Ensure it restarts with the latest changes
 
           # Verify deployment
           kubectl get pods  # To check the status of your pods after deployment
