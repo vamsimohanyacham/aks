@@ -54,7 +54,7 @@ jobs:
         run: |
           # Fetch AKS credentials
           az aks get-credentials --resource-group vamsi --name vamsiaks  # Replace with your AKS resource group and name
-          
+
           # Apply deployment and service YAML files
           kubectl apply -f aks/deployment.yaml  # Correct path to your AKS deployment YAML file
           kubectl apply -f aks/service.yaml     # Correct path to your AKS service YAML file
