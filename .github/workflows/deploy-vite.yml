@@ -73,7 +73,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Specify the type of runner
 
     steps:
       # Step 1: Checkout code from the repository
@@ -84,7 +84,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '23'  # You can update to a different Node.js version as needed
+          node-version: '23'  # You can change this to another Node.js version if needed
 
       # Step 3: Install dependencies using npm
       - name: Install dependencies
@@ -98,32 +98,32 @@ jobs:
       - name: Log in to Azure
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Ensure you set this in your GitHub Secrets
+          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Azure credentials are stored securely in GitHub Secrets
 
       # Step 6: Log in to Azure Container Registry (ACR) for pushing the Docker image
       - name: Log in to ACR (Azure Container Registry)
         run: |
-          az acr login --name vamsiacr  # Replace 'vamsiacr' with your ACR name
+          az acr login --name vamsiacr  # Replace 'vamsiacr' with your Azure Container Registry name
 
       # Step 7: Build the Docker image for the Vite.js app and tag it
       - name: Build Docker image
         run: |
-          docker build -t vamsiacr.azurecr.io/vite-app:latest .  # Replace with your actual ACR image name
+          docker build -t vamsiacr.azurecr.io/vite-app:latest .  # Replace with your ACR image name
 
       # Step 8: Push Docker image to Azure Container Registry (ACR)
       - name: Push Docker image to ACR
         run: |
-          docker push vamsiacr.azurecr.io/vite-app:latest  # Ensure your ACR URL and image name are correct
+          docker push vamsiacr.azurecr.io/vite-app:latest  # Ensure the ACR URL and image name are correct
 
       # Step 9: Get Azure AKS credentials and configure kubectl for deployment
       - name: Deploy to AKS
         run: |
-          # Fetch AKS credentials
+          # Fetch AKS credentials using Azure CLI
           az aks get-credentials --resource-group vamsi --name vamsiaks  # Replace with your AKS resource group and name
 
           # Apply the Kubernetes deployment and service YAML files
-          kubectl apply -f aks/deployment.yaml  # Update with the correct path to your AKS deployment YAML
-          kubectl apply -f aks/service.yaml     # Update with the correct path to your AKS service YAML
+          kubectl apply -f aks/deployment.yaml  # Path to your Kubernetes deployment YAML
+          kubectl apply -f aks/service.yaml     # Path to your Kubernetes service YAML
 
           # Restart the deployment to ensure the new image is used
           kubectl rollout restart deployment/my-vite-app-deployment  # Replace with your actual deployment name
@@ -131,5 +131,4 @@ jobs:
           # Verify the deployment status
           kubectl get pods  # To check the status of your pods after deployment
           kubectl get services  # To check the status of your services after deployment
-
 
