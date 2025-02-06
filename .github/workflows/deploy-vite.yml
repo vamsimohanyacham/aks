@@ -136,7 +136,7 @@ name: Deploy Vite.js App to AKS
 on:
   push:
     branches:
-      - main  # Trigger on push to the 'main' branch
+      - main  # Trigger the workflow when changes are pushed to 'main'
 
 jobs:
   build-and-deploy:
@@ -158,15 +158,26 @@ jobs:
                   "to": [{"email": "vamsi@middlewaretalents.com"}],
                   "subject": "Please approve the deployment"
                 }],
-                "from": {"email": "vamsimohanyacham@gmail.com"},
+                "from": {"email": "vamsi@middlewaretalents.com"},
                 "content": [{
                   "type": "text/html",
-                  "value": "<html><body><h2>Deploy Vite.js App to AKS</h2><p>Click the button below to approve the deployment:</p><a href='https://github.com/vamsimohanyacham/aks/approve-deployment?token=${{ secrets.APPROVAL_TOKEN }}'>Approve Deployment</a></body></html>"
+                  "value": "<html><body><h2>Deploy Vite.js App to AKS</h2><p>Click the button below to approve the deployment:</p><a href=\"https://github.com/vamsimohanyacham/aks/actions/workflows/deploy-vite.yml/dispatches?token=${{ secrets.APPROVAL_TOKEN }}\">Approve Deployment</a></body></html>"
                 }]
               }'
+      
+      # Step 3: Simulate waiting for approval (this step is just a placeholder for the actual approval process)
+      - name: Wait for approval
+        run: |
+          echo "Waiting for approval..."
+          sleep 10  # You can adjust the waiting period as needed
 
-      # Step 3: Await approval via a custom approval system (could use external API to handle approval)
-
-      # The rest of your workflow steps (building Docker image, pushing to ACR, deploying to AKS) remain the same
-
-
+      # Step 4: Deploy to AKS
+      - name: Deploy Vite.js app to AKS
+        run: |
+          # Continue with the deployment process after approval
+          az aks get-credentials --resource-group vamsi --name vamsiaks  # Replace with your AKS resource group and name
+          kubectl apply -f aks/deployment.yaml  # Correct path to your AKS deployment YAML file
+          kubectl apply -f aks/service.yaml     # Correct path to your AKS service YAML file
+          kubectl rollout restart deployment/my-vite-app-deployment  # Restart the deployment
+          kubectl get pods  # Verify the status of your pods after deployment
+          kubectl get services  # Verify the status of your services after deployment
